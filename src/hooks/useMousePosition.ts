@@ -1,22 +1,33 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, reactive, toRefs } from 'vue'
 
 function useMousePosition() {
-  const x = ref(0)
-  const y = ref(0)
-  const updateMouse = (e: MouseEvent) => {
-    x.value = e.pageX
-    y.value = e.pageY
+  // 接口
+  interface PositionPoint {
+    x: number;
+    y: number;
+    updateMouse: (e: MouseEvent) => void;
   }
+  
+  const pointData: PositionPoint = reactive({
+    x: 0,
+    y: 0,
+    updateMouse: (e: MouseEvent) => {
+      pointData.x = e.pageX
+      pointData.y = e.pageY
+    }
+  })
+
+  const refPointData = toRefs(pointData)
 
   onMounted(() => {
     // 添加事件
-    document.addEventListener('click', updateMouse)
+    document.addEventListener('click', pointData.updateMouse)
   });
   onUnmounted(() => {
-    document.removeEventListener('click', updateMouse)
+    document.removeEventListener('click', pointData.updateMouse)
   })
 
-  return { x, y }
+  return { x: refPointData.x, y: refPointData.y }
 }
 
 export default useMousePosition

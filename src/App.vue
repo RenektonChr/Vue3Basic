@@ -10,6 +10,8 @@
   </ul>
   <h1>{{ person.name }}</h1>
   <h1>{{ greetings }}</h1>
+  <h1 v-if="loading">Loading...</h1>
+  <img v-if="loaded" :src="result[0].url" alt="">
   <h1>X: {{ x }}, Y: {{ y }}</h1>
   <button @click="updateGreeting">updateGreeting</button>
 </template>
@@ -17,6 +19,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs, onUpdated, ref, watch } from "vue";
 import useMousePosition from './hooks/useMousePosition'
+import useURLLoader from './hooks/useURLLoader'
 
 interface DataProps {
   count: number;
@@ -24,6 +27,16 @@ interface DataProps {
   addCount: () => void;
   numbers: number[];
   person: { name?: string };
+}
+interface DogResult {
+  message: string;
+  status: string;
+}
+interface CatResult {
+  id: string;
+  url: string;
+  width: number;
+  height: number;
 }
 
 export default {
@@ -50,7 +63,13 @@ export default {
     const updateGreeting = () => {
       greetings.value += 'Hello'
     }
-
+    const { result, loading, loaded, error } = useURLLoader<CatResult[]>('https://api.thecatapi.com/v1/images/search?limit=1')
+    watch(result, () => {
+      if(result.value) {
+        console.log('value', result.value[0].url);
+      }
+    })
+    
     watch([greetings, () => data.count], (newVal, oldVal) => {
       console.log('newVal---->', newVal);
       console.log('oldVal---->', oldVal);
@@ -69,7 +88,11 @@ export default {
       greetings,
       updateGreeting,
       x,
-      y
+      y,
+      result, 
+      loading, 
+      loaded, 
+      error
     };
   },
 };

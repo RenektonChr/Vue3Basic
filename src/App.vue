@@ -83,6 +83,11 @@ export default {
     })
     
     const refData = toRefs(data)
+    const modalOpen = ref(false)
+    const openModal = () => {
+      modalOpen.value = true
+    }
+    
     data.numbers[1] = 999
     data.numbers.push(3)
     data.numbers.push(666)
@@ -97,7 +102,8 @@ export default {
       result, 
       loading, 
       loaded, 
-      error
+      error,
+      modalOpen
     };
   },
 };

@@ -8,6 +8,7 @@
       <h1>{{ number }}</h1>
     </li>
   </ul>
+  <modal />
   <h1>{{ person.name }}</h1>
   <h1>{{ greetings }}</h1>
   <h1 v-if="loading">Loading...</h1>
@@ -20,6 +21,7 @@
 import { computed, reactive, toRefs, onUpdated, ref, watch } from "vue";
 import useMousePosition from './hooks/useMousePosition'
 import useURLLoader from './hooks/useURLLoader'
+import modal from './components/modal.vue'
 
 interface DataProps {
   count: number;
@@ -41,6 +43,9 @@ interface CatResult {
 
 export default {
   name: "App",
+  components: {
+    modal
+  },
   setup() {
     
     onUpdated(() => {

@@ -8,20 +8,37 @@
       <h1>{{ number }}</h1>
     </li>
   </ul>
-  <modal />
+  <modal :isOpen="modalIsOpen" @close-modal="onModalClose">
+    My Modal !!!
+  </modal>
   <h1>{{ person.name }}</h1>
   <h1>{{ greetings }}</h1>
+  <p>{{err}}</p>
+  <Suspense>
+    <template #default>
+      <div>
+        <async-show />
+        <dog-show />
+      </div>
+    </template>
+    <template #fallback>
+      <h1>Loading.....</h1>
+    </template>
+  </Suspense>
   <h1 v-if="loading">Loading...</h1>
   <img v-if="loaded" :src="result[0].url" alt="">
   <h1>X: {{ x }}, Y: {{ y }}</h1>
   <button @click="updateGreeting">updateGreeting</button>
+  <button @click="openModal">openModal</button>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs, onUpdated, ref, watch } from "vue";
+import { computed, reactive, toRefs, onUpdated, ref, watch, onErrorCaptured } from "vue";
 import useMousePosition from './hooks/useMousePosition'
 import useURLLoader from './hooks/useURLLoader'
 import modal from './components/modal.vue'
+import AsyncShow from './components/AsyncShow.vue'
+import DogShow from './components/DogShow.vue'
 
 interface DataProps {
   count: number;
@@ -44,10 +61,15 @@ interface CatResult {
 export default {
   name: "App",
   components: {
-    modal
+    modal,
+    AsyncShow,
+    DogShow
   },
   setup() {
-    
+    const err = ref(null)
+    onErrorCaptured((e: any) => {
+      err.value = e
+    })
     onUpdated(() => {
       console.log('onUpdated');
     })
@@ -83,11 +105,13 @@ export default {
     })
     
     const refData = toRefs(data)
-    const modalOpen = ref(false)
+    const modalIsOpen = ref(false)
     const openModal = () => {
-      modalOpen.value = true
+      modalIsOpen.value = true
     }
-    
+    const onModalClose = () => {
+      modalIsOpen.value = false
+    }
     data.numbers[1] = 999
     data.numbers.push(3)
     data.numbers.push(666)
@@ -103,7 +127,10 @@ export default {
       loading, 
       loaded, 
       error,
-      modalOpen
+      modalIsOpen,
+      openModal,
+      onModalClose,
+      err
     };
   },
 };
